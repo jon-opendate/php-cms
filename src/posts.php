@@ -11,6 +11,13 @@ function all_posts(): array
         ->fetchAll();
 }
 
+function published_posts(): array
+{
+    return db()
+        ->query("SELECT * FROM posts WHERE status = 'published' ORDER BY updated_at DESC, id DESC")
+        ->fetchAll();
+}
+
 function find_post(int $id): ?array
 {
     $stmt = db()->prepare('SELECT * FROM posts WHERE id = :id');
@@ -20,10 +27,19 @@ function find_post(int $id): ?array
     return $post ?: null;
 }
 
+function find_published_post_by_slug(string $slug): ?array
+{
+    $stmt = db()->prepare("SELECT * FROM posts WHERE slug = :slug AND status = 'published'");
+    $stmt->execute(['slug' => $slug]);
+    $post = $stmt->fetch();
+
+    return $post ?: null;
+}
+
 function save_post(array $input, ?int $id = null): void
 {
     $title = trim((string) ($input['title'] ?? ''));
-    $slug = slugify((string) ($input['slug'] ?? $title));
+    $slug = slugify((string) ($input['slug'] ?? '') ?: $title);
     $body = trim((string) ($input['body'] ?? ''));
     $status = ($input['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
 
