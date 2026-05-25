@@ -4,22 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-- `docker compose up --build` — build and run the app at <http://localhost:8080>. The `db` service must reach `pg_isready` before `app` starts (healthcheck gates `depends_on`).
-- `docker compose down -v` — stop and remove the `postgres_data` named volume. Required to re-run the SQL in `db/init/` (Postgres only seeds an empty data directory).
-- `docker compose exec db psql -U cms -d cms` — open a psql shell against the running DB.
-- `docker compose exec app php -l /var/www/html/index.php` — lint a PHP file inside the container (no composer/test tooling is configured).
+There is no build step, test suite, composer setup, or linter config in this repo. Workflow:
 
-There is no test suite, linter config, or build step beyond Docker. To verify changes, hit routes with curl after bringing the stack up (e.g. `curl -s http://localhost:8080/`). If host port `5432` is busy, drop a gitignored `docker-compose.override.yml` that does `services.db.ports: !reset []` — the app still talks to the DB over the Docker network.
+- Serve `public/` with any PHP-capable web server pointed at a running PostgreSQL, with the `DB_*` env vars set (see `src/db.php` for defaults).
+- Load or reload the schema: `psql -d cms -f db/init/001_posts.sql`. The seed `INSERT` uses `ON CONFLICT (slug) DO NOTHING`, so re-running it is safe.
+- Lint a single file: `php -l path/to/file.php`.
+- Verify routes by curling them, e.g. `curl -sS -o /dev/null -w '%{http_code}\n' http://localhost:8080/`.
 
 ## Architecture
 
-PHP 8.3 + Apache + mod_php in front of PostgreSQL 16. The site has a **public face at `/`** and an **admin face at `/admin`** — no auth, this is intentional for the test app.
+PHP app served by a front controller, talking to PostgreSQL through PDO. Public site lives at `/`; the editor lives at `/admin` — there is no authentication, by design.
 
 ### Front controller + routing
 
-Apache has `mod_rewrite` enabled (Dockerfile) and `AllowOverride All` on `/var/www/html` (set by `apache/cms.conf` copied into `/etc/apache2/conf-enabled/`). `public/.htaccess` rewrites any request that isn't a real file or directory to `index.php`, so `styles.css` and other static files still serve directly while everything else hits the front controller.
+`public/.htaccess` rewrites any request that isn't a real file or directory to `public/index.php`. Real files (`styles.css`) bypass the rewrite and are served directly. The web server must support that rewrite — Apache with `mod_rewrite` and `AllowOverride All` over `public/` works out of the box; on other servers, the same effect can be achieved with a single "fall through to `index.php`" rule.
 
-`public/index.php` is the only router. It splits `REQUEST_URI`'s path into segments and dispatches:
+`public/index.php` is the only router. It splits the request path into segments and dispatches:
 
 - `/` → `view('home', ['posts' => published_posts()])`
 - `/{slug}` → `find_published_post_by_slug($slug)`; renders `views/post.php` or 404s
@@ -29,13 +29,13 @@ Apache has `mod_rewrite` enabled (Dockerfile) and `AllowOverride All` on `/var/w
 
 ### Data layer
 
-- `src/db.php` — `db()` returns a memoized PDO singleton. Connection params come from `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASS` env vars (set by `docker-compose.yml`), with localhost/`cms`/`cms_password` fallbacks.
+- `src/db.php` — `db()` returns a memoized PDO singleton. Connection params come from `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASS` env vars, with `localhost`/`cms`/`cms_password` fallbacks.
 - `src/posts.php` — plain functions over the `posts` table. Two pairs matter: `all_posts()` / `find_post($id)` are admin-only (return all statuses); `published_posts()` / `find_published_post_by_slug($slug)` are the public-side queries and filter to `status = 'published'`. Drafts are therefore invisible from `/{slug}` even though the row exists. `save_post()` doubles as create/update based on whether `$id` is null.
 
 ### Rendering
 
 `src/render.php` exposes `e()` (HTML-escape) and `view($template, $vars)` (extracts vars and `require`s `src/views/{$template}.php`). Every view template is a self-contained HTML document — there is no shared layout file. The `e()` helper must wrap any user-controlled value before it hits the page.
 
-### Schema seeding
+### Schema
 
-`db/init/*.sql` is mounted at `/docker-entrypoint-initdb.d` and run by Postgres **only when the data directory is empty**. Schema changes after first boot require dropping the `postgres_data` volume (`docker compose down -v`) or writing a real migration. The `posts.slug` column has a `UNIQUE` constraint; `save_post` does not catch the resulting `PDOException`, so duplicate slugs surface as the red error banner in `views/admin.php` (rendered from the caught `Throwable` in `admin_dispatch`).
+`db/init/001_posts.sql` is the canonical schema. It's idempotent (`CREATE TABLE IF NOT EXISTS`, `ON CONFLICT (slug) DO NOTHING`) but schema *changes* must be applied manually — there is no migration tool. The `posts.slug` column has a `UNIQUE` constraint; `save_post` does not catch the resulting `PDOException`, so duplicate slugs surface as the red error banner in `views/admin.php` (rendered from the caught `Throwable` in `admin_dispatch`).

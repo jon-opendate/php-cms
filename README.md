@@ -1,25 +1,34 @@
 # PHP CMS
 
-A small test CMS built with PHP, Apache, and PostgreSQL.
+A small test CMS built with PHP and PostgreSQL.
 
-## Run it
+## Requirements
+
+- PHP 8.1+ with the `pdo_pgsql` extension
+- PostgreSQL 12+
+- A web server able to serve `public/` as the document root and rewrite
+  unmatched requests to `public/index.php` (e.g. via mod_rewrite using the
+  bundled `.htaccess`)
+
+## Setup
+
+Create the database and load the schema:
 
 ```sh
-docker compose up --build
+createdb cms
+psql -d cms -f db/init/001_posts.sql
 ```
 
-Open <http://localhost:8080>.
+Configure the app with these environment variables (defaults in parentheses):
 
-The app service runs PHP 8.3 with Apache. The database service runs PostgreSQL
-16 and initializes a `posts` table with one sample post.
+- `DB_HOST` (`localhost`)
+- `DB_PORT` (`5432`)
+- `DB_NAME` (`cms`)
+- `DB_USER` (`cms`)
+- `DB_PASS` (`cms_password`)
 
-## Database settings
+## Routes
 
-The compose file uses these defaults:
-
-- Database: `cms`
-- User: `cms`
-- Password: `cms_password`
-- Host from the app container: `db`
-
-Postgres data is stored in the named Docker volume `postgres_data`.
+- `/` — public list of published posts
+- `/{slug}` — single published post
+- `/admin` — editor (create, edit, delete); no authentication
