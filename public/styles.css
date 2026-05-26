@@ -1,12 +1,12 @@
 :root {
     color-scheme: light;
-    --bg: #f5f2ea;
+    --bg: #f0ecf5;
     --panel: #ffffff;
-    --ink: #1d2528;
-    --muted: #647176;
-    --line: #d9dedc;
-    --accent: #087f8c;
-    --accent-dark: #06606a;
+    --ink: #2a2238;
+    --muted: #756880;
+    --line: #ddd3e3;
+    --accent: #6750a4;
+    --accent-dark: #4a3a78;
     --danger: #b42318;
 }
 
@@ -35,7 +35,7 @@ body {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
-    box-shadow: 0 12px 30px rgba(29, 37, 40, 0.08);
+    box-shadow: 0 12px 30px rgba(42, 34, 56, 0.08);
 }
 
 .editor {
@@ -119,12 +119,12 @@ button:hover,
 }
 
 .secondary {
-    background: #e7eeee;
+    background: #ece6f3;
     color: var(--ink);
 }
 
 .secondary:hover {
-    background: #d8e3e2;
+    background: #ddd3e8;
 }
 
 .danger {
@@ -190,7 +190,7 @@ button:hover,
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
-    box-shadow: 0 12px 30px rgba(29, 37, 40, 0.08);
+    box-shadow: 0 12px 30px rgba(42, 34, 56, 0.08);
     padding: 22px 24px;
 }
 
@@ -223,7 +223,7 @@ button:hover,
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
-    box-shadow: 0 12px 30px rgba(29, 37, 40, 0.08);
+    box-shadow: 0 12px 30px rgba(42, 34, 56, 0.08);
     padding: 32px;
 }
 
@@ -266,7 +266,7 @@ button:hover,
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
-    box-shadow: 0 12px 30px rgba(29, 37, 40, 0.08);
+    box-shadow: 0 12px 30px rgba(42, 34, 56, 0.08);
     padding: 18px 22px;
     display: grid;
     grid-template-columns: 1fr auto;
