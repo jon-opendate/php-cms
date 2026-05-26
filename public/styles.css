@@ -10,6 +10,30 @@
     --danger: #c41e3a;
 }
 
+[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0d1117;
+    --panel: #161b22;
+    --ink: #f0f6fc;
+    --muted: #8b949e;
+    --line: #30363d;
+    --accent: #00d9ff;
+    --accent-dark: #00a8c8;
+    --danger: #ff5555;
+}
+
+[data-theme="purple"] {
+    color-scheme: light;
+    --bg: #f0ecf5;
+    --panel: #ffffff;
+    --ink: #2a2238;
+    --muted: #756880;
+    --line: #ddd3e3;
+    --accent: #6750a4;
+    --accent-dark: #4a3a78;
+    --danger: #b42318;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -313,7 +337,115 @@ button:hover,
     font-size: 0.85rem;
 }
 
+.theme-picker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100vh;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 16px 12px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.theme-picker h3 {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.theme-list {
+    list-style: none;
+    margin: 0 0 20px;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.theme-item {
+    border: none;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.theme-item:hover {
+    border-color: var(--accent);
+}
+
+.theme-item.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+}
+
+.theme-custom {
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+}
+
+.theme-custom input {
+    width: 100%;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: var(--bg);
+    color: var(--ink);
+}
+
+.theme-color-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 0.75rem;
+}
+
+.theme-color-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.theme-color-item label {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.theme-color-item input[type="color"] {
+    width: 100%;
+    height: 30px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 2px;
+}
+
+body {
+    margin-left: 200px;
+}
+
 @media (max-width: 760px) {
+    .theme-picker {
+        width: 150px;
+    }
+
+    body {
+        margin-left: 150px;
+    }
+
     .shell {
         grid-template-columns: 1fr;
         margin-top: 16px;

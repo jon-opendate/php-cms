@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+    <?php require __DIR__ . '/_theme_picker.php'; ?>
     <main class="site">
         <header class="site-header">
             <h1>404</h1>

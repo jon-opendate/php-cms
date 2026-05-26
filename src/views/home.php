@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+    <?php require __DIR__ . '/_theme_picker.php'; ?>
     <main class="site">
         <header class="site-header">
             <p class="eyebrow">PostgreSQL + Redis backed · <a href="/health">health</a></p>

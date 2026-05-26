@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+    <?php require __DIR__ . '/_theme_picker.php'; ?>
     <main class="shell">
         <section class="editor">
             <div>

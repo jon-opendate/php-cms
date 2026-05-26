@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+    <?php require __DIR__ . '/_theme_picker.php'; ?>
     <main class="site">
         <p class="back"><a href="/">← All posts</a></p>
         <article class="single">
