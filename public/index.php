@@ -15,15 +15,27 @@ if (($segments[0] ?? null) === 'admin') {
     return;
 }
 
+if ($segments === ['health']) {
+    require __DIR__ . '/../src/health.php';
+    $checks = health_report();
+    $ok = $checks['postgres']['ok'] && $checks['redis']['ok'];
+    http_response_code($ok ? 200 : 503);
+    view('health', ['checks' => $checks, 'ok' => $ok]);
+    return;
+}
+
 if ($segments === []) {
-    view('home', ['posts' => published_posts()]);
+    $posts = published_posts();
+    $views = post_view_counts(array_map(static fn (array $p): int => (int) $p['id'], $posts));
+    view('home', ['posts' => $posts, 'views' => $views]);
     return;
 }
 
 if (count($segments) === 1) {
     $post = find_published_post_by_slug($segments[0]);
     if ($post !== null) {
-        view('post', ['post' => $post]);
+        $views = record_post_view((int) $post['id']);
+        view('post', ['post' => $post, 'views' => $views]);
         return;
     }
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/redis.php';
 
 function all_posts(): array
 {
@@ -81,4 +82,36 @@ function slugify(string $value): string
     $slug = strtolower(trim($value));
     $slug = preg_replace('/[^a-z0-9]+/', '-', $slug) ?: '';
     return trim($slug, '-');
+}
+
+function record_post_view(int $postId): int
+{
+    return (int) redis()->incr("post:views:{$postId}");
+}
+
+function post_view_count(int $postId): int
+{
+    return (int) (redis()->get("post:views:{$postId}") ?: 0);
+}
+
+function post_view_counts(array $postIds): array
+{
+    if ($postIds === []) {
+        return [];
+    }
+
+    $keys = array_map(static fn (int $id): string => "post:views:{$id}", $postIds);
+    $values = redis()->mget($keys);
+
+    $out = [];
+    foreach ($postIds as $i => $id) {
+        $out[(int) $id] = (int) ($values[$i] ?: 0);
+    }
+
+    return $out;
+}
+
+function forget_post_view_count(int $postId): void
+{
+    redis()->del("post:views:{$postId}");
 }

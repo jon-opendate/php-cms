@@ -13,7 +13,9 @@ function admin_dispatch(array $segments, string $method): void
     if ($method === 'POST') {
         try {
             if (($segments[0] ?? null) === 'delete' && isset($segments[1])) {
-                delete_post((int) $segments[1]);
+                $postId = (int) $segments[1];
+                delete_post($postId);
+                forget_post_view_count($postId);
             } elseif (($segments[0] ?? null) === 'edit' && isset($segments[1])) {
                 save_post($_POST, (int) $segments[1]);
             } else {
@@ -31,8 +33,12 @@ function admin_dispatch(array $segments, string $method): void
         $editing = find_post((int) $segments[1]);
     }
 
+    $posts = all_posts();
+    $views = post_view_counts(array_map(static fn (array $p): int => (int) $p['id'], $posts));
+
     view('admin', [
-        'posts' => all_posts(),
+        'posts' => $posts,
+        'views' => $views,
         'editing' => $editing,
         'error' => $error,
     ]);

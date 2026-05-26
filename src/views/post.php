@@ -1,4 +1,9 @@
-<?php /** @var array<string,mixed> $post */ ?>
+<?php
+/**
+ * @var array<string,mixed> $post
+ * @var int $views
+ */
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,7 +18,10 @@
         <article class="single">
             <header>
                 <h1><?= e((string) $post['title']) ?></h1>
-                <p class="meta">Updated <?= e((string) $post['updated_at']) ?></p>
+                <p class="meta">
+                    Updated <?= e((string) $post['updated_at']) ?>
+                    · <?= (int) $views ?> views
+                </p>
             </header>
             <div class="body">
                 <?php foreach (preg_split('/\R{2,}/', (string) $post['body']) as $paragraph): ?>

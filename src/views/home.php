@@ -1,4 +1,9 @@
-<?php /** @var array<int,array<string,mixed>> $posts */ ?>
+<?php
+/**
+ * @var array<int,array<string,mixed>> $posts
+ * @var array<int,int> $views
+ */
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,7 +15,7 @@
 <body>
     <main class="site">
         <header class="site-header">
-            <p class="eyebrow">PostgreSQL backed</p>
+            <p class="eyebrow">PostgreSQL + Redis backed · <a href="/health">health</a></p>
             <h1>PHP CMS</h1>
         </header>
 
@@ -22,7 +27,10 @@
                     <li>
                         <article>
                             <h2><a href="/<?= e((string) $post['slug']) ?>"><?= e((string) $post['title']) ?></a></h2>
-                            <p class="meta">Updated <?= e((string) $post['updated_at']) ?></p>
+                            <p class="meta">
+                                Updated <?= e((string) $post['updated_at']) ?>
+                                · <?= (int) ($views[(int) $post['id']] ?? 0) ?> views
+                            </p>
                             <p class="excerpt"><?= e(mb_strimwidth((string) $post['body'], 0, 220, '…')) ?></p>
                         </article>
                     </li>

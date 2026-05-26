@@ -1,6 +1,7 @@
 <?php
 /**
  * @var array<int,array<string,mixed>> $posts
+ * @var array<int,int> $views
  * @var array<string,mixed>|null $editing
  * @var string|null $error
  */
@@ -66,7 +67,7 @@
             <?php foreach ($posts as $post): ?>
                 <article class="post">
                     <div>
-                        <p class="status"><?= e((string) $post['status']) ?></p>
+                        <p class="status"><?= e((string) $post['status']) ?> · <?= (int) ($views[(int) $post['id']] ?? 0) ?> views</p>
                         <h2><?= e((string) $post['title']) ?></h2>
                         <p class="slug">
                             <?php if ($post['status'] === 'published'): ?>
